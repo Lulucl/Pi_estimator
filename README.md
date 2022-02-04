@@ -5,24 +5,40 @@ Cette application permet d'estimer pi avec spark et numpy
 Travail en binome : CONTAL Lucie et LE QUENTREC Jade
 
 n = 100000
+
 spark :
-temps d execution = 0.09695306301116943
+
+temps d execution = 0.09695306301116943 ms
+
 valeurs de pi = 3.1406656
-ecart % Math.pi = 0.029509032265326775
+
+ecart % Math.pi = 0.029509032265326775 %
+
 numpy :
-temps d execution = 0.025617461204528808
+
+temps d execution = 0.025617461204528808 ms
+
 valeurs de pi = 3.14123
-ecart % Math.pi = 0.01154362228911298
+
+ecart % Math.pi = 0.01154362228911298 %
 
 n = 1000000
+
 spark :
-temps d execution = 0.18919002056121825
+
+temps d execution = 0.18919002056121825 ms
+
 valeurs de pi = 3.14186384
-ecart % Math.pi = 0.008632131536756767
+
+ecart % Math.pi = 0.008632131536756767 %
+
 numpy :
-temps d execution = 0.21743435859680177
+
+temps d execution = 0.21743435859680177 ms
+
 valeurs de pi = 3.14174412
-ecart % Math.pi = 0.004821325579355914
+
+ecart % Math.pi = 0.004821325579355914 %
 
 Plus n est grand, plus le temps d execution augmente et plus le pourcentage d erreur est faible. 
 
