@@ -6,10 +6,11 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, FloatType
 import sys
 from random import random 
-import timeit
+import time
 from operator import add
 import shutil
 import os
+import statistics
 
 if os.path.exists("./../OUTPUT"):
 	shutil.rmtree("./../OUTPUT") 
@@ -24,42 +25,56 @@ def is_point_inside_unit_circle(p):
     return 1 if x*x + y*y < 1 else 0 #verifier si les deux points sont dans le cercle
     
 def pi_estimator_spark(n): 
-	start = timeit.timeit()
+	start = time.time()
 	count = sc.parallelize(range(0, n))
 	temp = count.map(is_point_inside_unit_circle)
 	nin = temp.reduce(add)
-	end = timeit.timeit()
+	end = time.time()
 	esti_pi = (4.0 * nin / n)
 	tps_spark = end-start
 	return tps_spark, esti_pi
 
 
 def pi_estimator_numpy(n):
-	start = timeit.timeit()
+	start = time.time()
 	nin=0
 	for i in range (0,n):
 		nin=nin+is_point_inside_unit_circle(1)
 		
 	esti_pi=4*nin/n
-	end = timeit.timeit()
+	end = time.time()
 	tps_numpy=end-start
 	return tps_numpy, esti_pi
 	
 n = 1000000
 
+measures_tps_spark = []
+measures_tps_numpy = []
+measures_pi_spark = []
+measures_pi_numpy = []
 
-[tps_spark, pi_spark]=pi_estimator_spark(n)
-[tps_numpy, pi_numpy]=pi_estimator_numpy(n)
+for i in range(100):
+	[tps_spark_temp, pi_spark_temp]=pi_estimator_spark(n)
+	[tps_numpy_temp, pi_numpy_temp]=pi_estimator_numpy(n)
+	measures_tps_spark.append(tps_spark_temp)
+	measures_tps_numpy.append(tps_numpy_temp)
+	measures_pi_spark.append(pi_spark_temp)
+	measures_pi_numpy.append(pi_numpy_temp)
 
+tps_spark = statistics.mean(measures_tps_spark)
+tps_numpy = statistics.mean(measures_tps_numpy)
+pi_spark = statistics.mean(measures_pi_spark)
+pi_numpy = statistics.mean(measures_pi_numpy)
 pourcent_spark=abs((pi_spark-math.pi)*100/math.pi)
 pourcent_numpy=abs((pi_numpy-math.pi)*100/math.pi)
 
-print('temps de calcul avec numpy',tps_numpy)
-print('temps de calcul avec spark',tps_spark)
-print('estimation de pi avec spark=',pi_spark)
-print('estimation de pi avec numpy=',pi_numpy)
-print('pourcentage d erreur avec numpy',pourcent_numpy)
-print('pourcentage d erreur avec spark',pourcent_spark)
+print("n = ",n)
+print('temps de calcul avec numpy en ms : ',tps_numpy)
+print('temps de calcul avec spark en ms : ',tps_spark)
+print('estimation de pi avec numpy : ',pi_numpy)
+print('estimation de pi avec spark : ',pi_spark)
+print('pourcentage d erreur avec numpy : ',pourcent_numpy)
+print('pourcentage d erreur avec spark : ',pourcent_spark)
 
 sc.parallelize([tps_spark]).saveAsTextFile("./../OUTPUT/Spark/Temps")
 sc.parallelize([pi_spark]).saveAsTextFile("./../OUTPUT/Spark/Estimation_pi")
